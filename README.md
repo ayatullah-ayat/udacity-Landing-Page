@@ -1,7 +1,7 @@
 # Udacity Landing Page Project
 
 
-* [Instructions](#instructions)
+
 
 ## Instructions
 

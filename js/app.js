@@ -19,9 +19,6 @@
 */
 const navbarList = document.getElementById('navbar__list');
 const main = document.getElementById('main');
-const section1 = document.getElementById('section1');
-const section2 = document.getElementById('section2');
-const section3 = document.getElementById('section3');
 
 /**
  * End Global Variables
@@ -30,25 +27,49 @@ const section3 = document.getElementById('section3');
 */
 
 const createNavbarList = (numberOfList) => {
+    const li = document.querySelector('#navbar__list');
+
     let listAll = '';
     for(i = 0; i < numberOfList; i++) {
         if(i == 0){
-            listAll += ''.concat(`<a class="menu__link" id="menu${i+1}" href="#section${i + 1}"><li>section ${i + 1}</li></a>`);
+            listAll += ''.concat(`<a class="menu__link" data-menu="menu ${i+1}"><li>section ${i + 1}</li></a>`);
         }else{
-            listAll += ''.concat(`<a class="menu__link" id="menu${i+1}" href="#section${i + 1}"><li>section ${i + 1}</li></a>`);
+            listAll += ''.concat(`<a class="menu__link" data-menu="menu ${i+1}"><li>section ${i + 1}</li></a>`);
         }
     }
     return listAll;
 }
 
+function makeAllInActive() {
+    menus.forEach(menu => {
+        menu.classList.remove('active')
+    })
+}
+function makeAtive(singleSection) {
 
-
+    // make sure if this is Landing Page section
+    if(singleSection.length == 0) {
+        makeAllInActive();
+        return
+    }
+    menus.forEach(menu => {
+        const menuData = menu.dataset.menu.split(' ')[1];
+        const sectionData = singleSection[0].dataset.nav.split(' ')[1];
+        if(menuData === sectionData) {
+            // add active class
+            menu.classList.add('active')
+        }else{
+            // remove active class
+            menu.classList.remove('active')
+        }
+        console.log(singleSection)
+    })
+}
 /**
  * End Helper Functions
  * Begin Main Functions
  * 
 */
-
 // build the nav
 navbarList.innerHTML = createNavbarList(4);
 
@@ -68,53 +89,31 @@ const section4 = document.getElementById('section4')
 // end build new section
 
 
-// Add class 'active' to section when near top of viewport
-let menu1 = document.getElementById('menu1');
-let menu2 = document.getElementById('menu2');
-let menu3 = document.getElementById('menu3');
-let menu4 =  document.getElementById('menu4');
+/****************scroll feature for the appropriatee ************* 
+                 position(use: scrollIntoView() 
+ *****************************************************************/
+const menus = document.querySelectorAll('.menu__link')
 
-function makeActive(sectionName) {
-    if(sectionName == 'section1') {
-        menu1.classList.add('active');
-        menu2.classList.remove('active');
-    }if(sectionName == 'section2') {
-        menu1.classList.remove('active');
-        menu2.classList.add('active');
-        menu3.classList.remove('active');
-    }if(sectionName == 'section3') {
-        menu2.classList.remove('active');
-        menu3.classList.add('active');
-        menu4.classList.remove('active');
-    }if(sectionName == 'section4') {
-        menu4.classList.add('active');
-        menu3.classList.remove('active');
-    }
-}
+menus.forEach((menu, index) => {
+    menu.addEventListener('click', function() {
+        const section = document.querySelector('#section' + (index + 1))
+        section.scrollIntoView({behavior: "smooth"})
+    })
+})
+
+
+/****************active menu through the ************* 
+                 section being viewed by user 
+ * ************************************************/
+
+const sectionAll = document.getElementsByTagName('section');
+const makeArrayOfSectionAll = Array.from(sectionAll)
+
 window.addEventListener('scroll', function() {
-    const box = {
-        box1: section1.getBoundingClientRect(),
-        box2: section2.getBoundingClientRect(),
-        box3: section3.getBoundingClientRect(),
-        box4: section4.getBoundingClientRect()
-    }
-    // condition for nearest section
-    if(box.box1.top <= 150 && box.box1.bottom >= 150) {
-        makeActive('section1');
-        console.log(box.box1.top)
-    }if(box.box2.top <= 150 && box.box2.bottom >= 150) {
-        makeActive('section2');
-    }if(box.box3.top <= 150 && box.box3.bottom >= 150) {
-        makeActive('section3');
-    }if(box.box4.top <= 150 && box.box4.bottom >= 150) {
-        makeActive('section4');
-    }
-    // special condition for default aspects of site
-    if(box.box1.top > 150){
-        menu1.classList.remove('active');
-        menu2.classList.remove('active');
-        menu3.classList.remove('active');
-    }
+    const findViewedSection = makeArrayOfSectionAll.filter(sect => {
+        const box = sect.getBoundingClientRect();
+        return box.top <= 150 && box.bottom >= 150
+    })
+    makeAtive(findViewedSection);
     
-});
-
+})
